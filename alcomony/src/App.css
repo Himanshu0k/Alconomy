@@ -1,0 +1,17 @@
+@font-face {
+  font-family: "MyFont";
+  src: url("font.woff2") format("woff2");
+  font-display: swap; /* Show system font first */
+}
+.winky-sans {
+  font-family: "Winky Sans", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 400; /* Change weight as needed */
+  font-style: normal;
+}
+.montserrat-homefont {
+  font-family: "Montserrat", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 600; /* Change weight as needed */
+  font-style: normal;
+}
