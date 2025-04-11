@@ -6,10 +6,7 @@ import { useState, useEffect, useRef } from "react";
 function EnterExpense() {
   const [description, setDescription] = useState("");
   const [amount, setAmount] = useState("");
-  const [date, setDate] = useState(() => {
-    const today = new Date();
-    return today.toISOString().split("T")[0]; // yyyy-mm-dd
-  });
+  const [date, setDate] = useState(() => new Date().toISOString().split("T")[0]);
   const [expenses, setExpenses] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -21,15 +18,11 @@ function EnterExpense() {
 
   useEffect(() => {
     fetchExpenses();
-
-    const SpeechRecognition =
-      window.SpeechRecognition || window.webkitSpeechRecognition;
-
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition) {
       alert("Speech Recognition API not supported in this browser.");
       return;
     }
-
     const recognition = new SpeechRecognition();
     recognition.continuous = true;
     recognition.interimResults = true;
@@ -89,22 +82,18 @@ function EnterExpense() {
       setDate(new Date().toISOString().split("T")[0]);
     } catch (err) {
       console.error(err);
-      setError(
-        err.response?.data?.error || "Failed to add expense. Please try again."
-      );
+      setError(err.response?.data?.error || "Failed to add expense. Please try again.");
     }
     setLoading(false);
   };
 
   const startListening = () => {
-    if (!recognitionRef.current) return;
-    recognitionRef.current.start();
+    recognitionRef.current?.start();
     setIsListening(true);
   };
 
   const stopListening = () => {
-    if (!recognitionRef.current) return;
-    recognitionRef.current.stop();
+    recognitionRef.current?.stop();
     setIsListening(false);
   };
 
@@ -136,123 +125,111 @@ function EnterExpense() {
     setShowModal(false);
   };
 
-  const totalExpenses = expenses.reduce(
-    (acc, expense) => acc + expense.amount,
-    0
-  );
+  const totalExpenses = expenses.reduce((acc, expense) => acc + expense.amount, 0);
 
   return (
-    <div className="flex min-h-screen bg-gray-900 text-white">
-      <aside className="w-64 h-screen overflow-y-auto bg-gray-800 border-r border-gray-700">
+    <div className="flex min-h-screen bg-gradient-to-br from-white to-gray-100 text-gray-800">
+      <div className="fixed left-0 top-0 h-full">
         <LeftNavbar />
-      </aside>
+      </div>
 
-      <main className="flex-1 flex flex-col overflow-hidden p-6">
+      <main className="flex-1 ml-64 p-10">
+        {/* Header */}
         <div className="mb-8">
-          <h2 className="text-2xl font-bold flex items-center gap-3">
-            <FaPlusCircle className="text-blue-400" />
+          <h2 className="text-4xl font-bold flex items-center gap-3 text-gray-800">
+            <FaPlusCircle className="text-indigo-500" />
             Expense Manager
           </h2>
-          <p className="text-gray-400 mt-2">
-            Track your expenses effortlessly
-          </p>
+          <p className="text-gray-500 mt-2">Track your expenses effortlessly</p>
         </div>
 
-        {/* Summary */}
-        <div className="bg-gray-800 rounded-xl p-4 mb-6 shadow-lg">
-          <h3 className="text-lg font-semibold">
+        {/* Total Summary */}
+        <div className="bg-white/70 backdrop-blur-lg p-6 rounded-2xl shadow-lg border border-gray-200 mb-8">
+          <h3 className="text-xl font-semibold">
             Total Expenses:
-            <span className="text-red-400 ml-2">
+            <span className="text-red-500 ml-2">
               ₹{totalExpenses.toLocaleString("en-IN")}
             </span>
           </h3>
         </div>
 
-        <form
-  onSubmit={handleSubmit}
-  className="bg-gray-800 rounded-xl p-6 shadow-lg mb-8"
->
-  <div className="grid grid-cols-1 md:grid-cols-6 gap-4 items-center">
-    <input
-      type="text"
-      value={description}
-      onChange={(e) => setDescription(e.target.value)}
-      placeholder="Expense Description"
-      className="bg-gray-700 rounded-lg p-3 focus:ring-2 focus:ring-blue-500 focus:outline-none w-full col-span-1 md:col-span-2"
-      disabled={loading}
-    />
+        {/* Form */}
+        <form onSubmit={handleSubmit} className="bg-white/70 backdrop-blur-lg p-6 rounded-2xl shadow-lg border border-gray-200 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-6 gap-4 items-center">
+            <input
+              type="text"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              placeholder="Expense Description"
+              className="bg-white/60 border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-indigo-500 focus:outline-none w-full col-span-2"
+              disabled={loading}
+            />
 
-    <input
-      type="number"
-      value={amount}
-      onChange={(e) => setAmount(e.target.value)}
-      placeholder="Amount"
-      className="bg-gray-700 rounded-lg p-3 focus:ring-2 focus:ring-blue-500 focus:outline-none w-full col-span-1 md:col-span-1"
-      disabled={loading}
-    />
+            <input
+              type="number"
+              value={amount}
+              onChange={(e) => setAmount(e.target.value)}
+              placeholder="Amount"
+              className="bg-white/60 border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-indigo-500 focus:outline-none w-full"
+              disabled={loading}
+            />
 
-    <input
-      type="date"
-      value={date}
-      onChange={(e) => setDate(e.target.value)}
-      className="bg-gray-700 rounded-lg p-3 text-white w-full focus:ring-2 focus:ring-blue-500 focus:outline-none col-span-1 md:col-span-1"
-      disabled={loading}
-    />
+            <input
+              type="date"
+              value={date}
+              onChange={(e) => setDate(e.target.value)}
+              className="bg-white/60 border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-indigo-500 focus:outline-none w-full"
+              disabled={loading}
+            />
 
-    <button
-      type="submit"
-      disabled={loading}
-      className="bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white font-bold py-3 rounded-lg transition-all flex items-center justify-center gap-2 w-full col-span-1 md:col-span-1 disabled:opacity-70"
-    >
-      <FaPlusCircle />
-      {loading ? "Adding..." : "Add Expense"}
-    </button>
+            <button
+              type="submit"
+              disabled={loading}
+              className="bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white font-bold py-3 rounded-lg transition-all flex items-center justify-center gap-2 w-full"
+            >
+              <FaPlusCircle />
+              {loading ? "Adding..." : "Add Expense"}
+            </button>
 
-    <div className="flex justify-center items-center col-span-1 md:col-span-1">
-      <button
-        onClick={handleMicClick}
-        type="button"
-        className="text-2xl hover:text-blue-400 transition p-2 bg-gray-700 rounded-full w-13 h-12 flex items-center justify-center"
-        title="Add via voice"
-      >
-        🎙️
-      </button>
-    </div>
-  </div>
+            <div className="flex justify-center items-center">
+              <button
+                onClick={handleMicClick}
+                type="button"
+                className="text-2xl hover:text-indigo-500 transition p-2 bg-white/60 border border-gray-300 rounded-full w-12 h-12 flex items-center justify-center"
+                title="Add via voice"
+              >
+                🎙️
+              </button>
+            </div>
+          </div>
 
-  {error && (
-    <div className="mt-4 p-3 bg-red-800/20 text-red-400 rounded-lg">
-      {error}
-    </div>
-  )}
-</form>
+          {error && (
+            <div className="mt-4 p-3 bg-red-100 text-red-600 rounded-lg border border-red-300">
+              {error}
+            </div>
+          )}
+        </form>
 
-
-        {/* Expense Table */}
-        <div className="bg-gray-800 rounded-xl shadow-lg overflow-hidden">
+        {/* Expenses Table */}
+        <div className="bg-white/70 backdrop-blur-lg rounded-2xl shadow-lg border border-gray-200 overflow-hidden">
           {expenses.length > 0 ? (
-            <table className="w-full">
-              <thead className="bg-gray-700">
+            <table className="w-full text-left">
+              <thead className="bg-gray-100 border-b border-gray-300">
                 <tr>
-                  <th className="p-4 text-left text-sm font-semibold">
-                    Description
-                  </th>
-                  <th className="p-4 text-left text-sm font-semibold">Amount</th>
-                  <th className="p-4 text-left text-sm font-semibold">Date</th>
+                  <th className="p-4 text-sm font-semibold">Description</th>
+                  <th className="p-4 text-sm font-semibold">Amount</th>
+                  <th className="p-4 text-sm font-semibold">Date</th>
                 </tr>
               </thead>
               <tbody>
                 {expenses.map((expense) => (
-                  <tr
-                    key={expense._id}
-                    className="border-b border-gray-700 hover:bg-gray-750 transition-colors"
-                  >
+                  <tr key={expense._id} className="border-b border-gray-200 hover:bg-gray-50">
                     <td className="p-4">{expense.description}</td>
-                    <td className="p-4 text-red-400 flex items-center gap-1">
+                    <td className="p-4 text-red-500 flex items-center gap-1">
                       <FaRupeeSign className="text-sm" />
                       {expense.amount.toLocaleString("en-IN")}
                     </td>
-                    <td className="p-4 text-gray-400">
+                    <td className="p-4 text-gray-500">
                       {new Date(expense.date).toLocaleDateString("en-IN", {
                         day: "numeric",
                         month: "short",
@@ -266,31 +243,30 @@ function EnterExpense() {
               </tbody>
             </table>
           ) : (
-            <div className="p-6 text-gray-400">No expenses recorded yet</div>
+            <div className="p-6 text-gray-500">No expenses recorded yet</div>
           )}
         </div>
 
-        {/* Voice-to-Text Modal */}
+        {/* Voice Modal with Transparent Background */}
         {showModal && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60">
-            <div className="bg-[#111827] border border-gray-600 rounded-lg shadow-lg w-[90%] max-w-2xl p-6">
+          <div className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm bg-white/10">
+            <div className="bg-white rounded-2xl shadow-lg w-[90%] max-w-2xl p-6 border border-gray-200">
               <div className="flex justify-between items-center mb-4">
-                <h3 className="text-xl font-semibold text-white">🎤 Listening...</h3>
+                <h3 className="text-xl font-semibold text-gray-800">🎤 Listening...</h3>
                 <button
                   onClick={handleCloseModal}
-                  className="text-sm text-red-400 hover:text-red-600 font-semibold"
+                  className="text-sm text-red-500 hover:text-red-700 font-semibold"
                 >
                   Close
                 </button>
               </div>
-              <div className="bg-[#1F2937] text-gray-300 border border-gray-700 p-4 rounded-lg min-h-[150px] whitespace-pre-wrap font-mono tracking-wide">
+              <div className="bg-gray-100 text-gray-700 border border-gray-300 p-4 rounded-lg min-h-[150px] whitespace-pre-wrap font-mono tracking-wide">
                 {transcript || "Try Something like: Buy milk for 40"}
               </div>
-
               <div className="mt-4 flex justify-end gap-2">
                 <button
                   onClick={handleVoiceUse}
-                  className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-medium"
+                  className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg font-medium"
                 >
                   Use this as Expense
                 </button>

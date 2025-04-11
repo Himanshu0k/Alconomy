@@ -12,9 +12,7 @@ import {
   Filler,
 } from "chart.js";
 import Testimonials from "./Testimonials";
-import LeftNavbar from "./LeftNavbar";
-import Header from "./Header"; // Import the Header component
-import Expenses from "./Expenses";
+import Header from "./Header";
 
 ChartJS.register(
   CategoryScale,
@@ -34,51 +32,46 @@ function ExpenseGraph() {
       {
         label: "Expenses",
         data: [65, 59, 80, 81, 56, 55, 40, 70],
-        borderColor: "#6366f1",
-        backgroundColor: "rgba(99, 102, 241, 0.2)",
-        borderWidth: 3,
-        pointRadius: 4,
-        pointHoverRadius: 6,
+        borderColor: "#ef4444",
+        backgroundColor: "rgba(239, 68, 68, 0.1)",
+        borderWidth: 2,
+        pointRadius: 3,
+        pointHoverRadius: 5,
         tension: 0.4,
-        fill: { target: "origin", above: "rgba(99, 102, 241, 0.1)" },
+        fill: true,
       },
     ],
   };
 
   return (
-    <div className="h-full w-full">
-      <Line
-        data={data}
-        options={{
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: { labels: { color: "#e5e7eb", font: { size: 14 } } },
-            title: {
-              display: true,
-              text: "Expenses Trend",
-              color: "#f3f4f6",
-              font: { size: 18 },
-            },
-            tooltip: {
-              backgroundColor: "#1f2937",
-              titleColor: "#f3f4f6",
-              bodyColor: "#e5e7eb",
-              borderColor: "#4b5563",
-              borderWidth: 1,
-              padding: 12,
-              intersect: false,
-              mode: "index",
+    <Line
+      data={data}
+      options={{
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            labels: {
+              color: "#4b5563",
+              font: { size: 14 },
             },
           },
-          scales: {
-            x: { grid: { color: "#374151" }, ticks: { color: "#9ca3af" } },
-            y: { grid: { color: "#374151" }, ticks: { color: "#9ca3af" } },
+          title: {
+            display: false,
           },
-          interaction: { mode: "nearest", intersect: false },
-        }}
-      />
-    </div>
+        },
+        scales: {
+          x: {
+            grid: { display: false },
+            ticks: { color: "#6b7280" },
+          },
+          y: {
+            grid: { color: "#e5e7eb" },
+            ticks: { color: "#6b7280" },
+          },
+        },
+      }}
+    />
   );
 }
 
@@ -90,55 +83,49 @@ function IncomeGraph() {
         label: "Income",
         data: [45, 60, 75, 90, 65, 60, 50, 80],
         borderColor: "#10b981",
-        backgroundColor: "rgba(16, 185, 129, 0.2)",
-        borderWidth: 3,
-        pointRadius: 4,
-        pointHoverRadius: 6,
+        backgroundColor: "rgba(16, 185, 129, 0.1)",
+        borderWidth: 2,
+        pointRadius: 3,
+        pointHoverRadius: 5,
         tension: 0.4,
-        fill: { target: "origin", above: "rgba(16, 185, 129, 0.1)" },
+        fill: true,
       },
     ],
   };
 
   return (
-    <div className="h-full w-full">
-      <Line
-        data={data}
-        options={{
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: { labels: { color: "#e5e7eb", font: { size: 14 } } },
-            title: {
-              display: true,
-              text: "Income Progression",
-              color: "#f3f4f6",
-              font: { size: 18 },
-            },
-            tooltip: {
-              backgroundColor: "#1f2937",
-              titleColor: "#f3f4f6",
-              bodyColor: "#e5e7eb",
-              borderColor: "#4b5563",
-              borderWidth: 1,
-              padding: 12,
-              intersect: false,
-              mode: "index",
+    <Line
+      data={data}
+      options={{
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            labels: {
+              color: "#4b5563",
+              font: { size: 14 },
             },
           },
-          scales: {
-            x: { grid: { color: "#374151" }, ticks: { color: "#9ca3af" } },
-            y: { grid: { color: "#374151" }, ticks: { color: "#9ca3af" } },
+          title: {
+            display: false,
           },
-          interaction: { mode: "nearest", intersect: false },
-        }}
-      />
-    </div>
+        },
+        scales: {
+          x: {
+            grid: { display: false },
+            ticks: { color: "#6b7280" },
+          },
+          y: {
+            grid: { color: "#e5e7eb" },
+            ticks: { color: "#6b7280" },
+          },
+        },
+      }}
+    />
   );
 }
 
 function Home() {
-  // Define the dynamic phrases that follow the static "AI"
   const phrases = [
     " Meets Finance and Profit Follows",
     " Unlocking New Financial Opportunities",
@@ -175,109 +162,95 @@ function Home() {
         setPhase("typing");
       }
     }
-  }, [text, phase, phraseIndex, phrases]);
+  }, [text, phase, phraseIndex]);
 
   return (
-    <div className="flex min-h-screen bg-gray-900">
-      {/* Left Navbar can be added here if needed */}
-      <div className="flex-1 overflow-auto">
-        {/* Header component added here */}
-        <Header />
-        <div className="flex flex-col px-8 py-12 md:px-16">
-          {/* Text Section */}
-          <div className="mb-16">
-            <div className="relative inline-block">
-              <h1 className="mb-6 bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-4xl font-bold text-transparent md:text-5xl lg:text-6xl">
-                AI{text}
-                <span
-                  className={`ml-2 border-r-2 border-white ${
-                    phase !== "waiting" ? "animate-blink" : ""
-                  }`}
-                ></span>
-              </h1>
-            </div>
+    <div className="min-h-screen bg-white text-gray-800 font-sans">
+      <Header />
+      <main className="px-6 py-12 md:px-20 lg:px-32">
+        {/* Hero Section */}
+        <div className="mb-16 text-center">
+          <h1 className="text-5xl md:text-6xl font-bold mb-4 leading-tight">
+            AI<span className="text-blue-600">{text}</span>
+            <span
+              className={`ml-1 border-r-2 border-gray-800 ${
+                phase !== "waiting" ? "animate-blink" : ""
+              }`}
+            ></span>
+          </h1>
+          <p className="text-lg md:text-xl text-gray-500 mt-4 max-w-2xl mx-auto">
+            Beautifully track, analyze, and optimize your finances with smart AI and sleek visuals.
+          </p>
+          <a href="/main">
+            <button className="mt-6 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-full text-lg font-semibold transition-all">
+              Get Started
+            </button>
+          </a>
+        </div>
 
-            <p className="mb-8 text-lg leading-relaxed text-gray-300 md:text-xl">
-              Streamline your financial operations with our comprehensive
-              expense tracking and budgeting solutions. Gain real-time insights
-              and take control of your finances.
-            </p>
-
-            <a href="/main">
-              <button className="transform rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 px-8 py-3 font-semibold text-white transition-all duration-300 hover:scale-105 hover:shadow-lg">
-                Get Started
-              </button>
-            </a>
+        {/* Graph Section */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
+          <div className="h-[400px] bg-white border border-gray-200 rounded-2xl shadow-sm p-6">
+            <ExpenseGraph />
           </div>
-
-          {/* Dual Graphs Section */}
-          <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
-            <div className="h-[500px] rounded-xl bg-gray-800 p-6 shadow-2xl">
-              <ExpenseGraph />
-            </div>
-            <div className="h-[500px] rounded-xl bg-gray-800 p-6 shadow-2xl">
-              <IncomeGraph />
-            </div>
-          </div>
-
-          {/* Stats Grid */}
-          <div className="mt-12 grid grid-cols-1 gap-6 md:grid-cols-3">
-            {[
-              {
-                title: "Total Balance",
-                value: "₹45,230",
-                change: "+2.5%",
-                color: "bg-green-500",
-              },
-              {
-                title: "Monthly Expenses",
-                value: "₹12,450",
-                change: "-1.2%",
-                color: "bg-red-500",
-              },
-              {
-                title: "Investment Growth",
-                value: "+8.7%",
-                change: "+0.8%",
-                color: "bg-blue-500",
-              },
-            ].map((stat, index) => (
-              <div key={index} className="rounded-xl bg-gray-800 p-6 shadow-lg">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-gray-400">{stat.title}</p>
-                    <p className="mt-2 text-3xl font-bold text-white">
-                      {stat.value}
-                    </p>
-                  </div>
-                  <div className={`${stat.color} rounded-full p-4`}>
-                    <span className="text-2xl">📈</span>
-                  </div>
-                </div>
-                <p className="mt-4 text-sm text-gray-300">
-                  Last month: {stat.change}
-                </p>
-              </div>
-            ))}
+          <div className="h-[400px] bg-white border border-gray-200 rounded-2xl shadow-sm p-6">
+            <IncomeGraph />
           </div>
         </div>
-        <Testimonials />
-      </div>
 
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {[
+            {
+              title: "Total Balance",
+              value: "₹45,230",
+              change: "+2.5%",
+              color: "text-green-600",
+            },
+            {
+              title: "Monthly Expenses",
+              value: "₹12,450",
+              change: "-1.2%",
+              color: "text-red-600",
+            },
+            {
+              title: "Investment Growth",
+              value: "+8.7%",
+              change: "+0.8%",
+              color: "text-blue-600",
+            },
+          ].map((stat, index) => (
+            <div
+              key={index}
+              className="rounded-2xl bg-white border border-gray-200 shadow-sm p-6 transition-all hover:shadow-md"
+            >
+              <p className="text-sm text-gray-500">{stat.title}</p>
+              <p className="text-3xl font-bold mt-2">{stat.value}</p>
+              <p className={`mt-1 text-sm font-semibold ${stat.color}`}>
+                {stat.change} this month
+              </p>
+            </div>
+          ))}
+        </div>
+
+        {/* Testimonials Section */}
+        <div className="mt-20">
+          <Testimonials />
+        </div>
+      </main>
+
+      {/* Typing cursor animation */}
       <style jsx>{`
         @keyframes blink {
-          0% {
+          0%, 100% {
             opacity: 1;
           }
           50% {
             opacity: 0;
           }
-          100% {
-            opacity: 1;
-          }
         }
         .animate-blink {
-          animation: blink 1s infinite;
+          animation: blink 1s step-end infinite;
         }
       `}</style>
     </div>

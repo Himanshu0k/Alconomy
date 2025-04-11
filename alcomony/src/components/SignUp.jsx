@@ -38,30 +38,44 @@ const SignUp = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-800 flex items-center justify-center p-4">
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full max-w-md">
-        <div className="bg-white/10 backdrop-blur-lg rounded-2xl shadow-2xl overflow-hidden border border-white/20 p-8">
-          <h2 className="text-2xl font-bold text-gray-200 mb-6">Create Account</h2>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white flex items-center justify-center p-4">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="w-full max-w-md"
+      >
+        <div className="bg-white border border-gray-200 shadow-xl rounded-2xl p-8">
+          <h2 className="text-3xl font-bold text-gray-800 mb-6 text-center">Create Account</h2>
 
           <form onSubmit={handleSubmit}>
             {["name", "email", "password"].map((field, idx) => (
               <div className="mb-4" key={idx}>
-                <label className="block text-gray-400 text-sm mb-2 capitalize">{field}</label>
+                <label className="block text-sm text-gray-600 mb-2 capitalize">{field}</label>
                 <input
                   type={field === "password" ? "password" : "text"}
                   name={field}
                   value={formData[field]}
                   onChange={handleChange}
-                  className="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-3 text-gray-200 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all"
-                  placeholder={field === "name" ? "John Doe" : field === "email" ? "email@example.com" : "••••••••"}
+                  className="w-full bg-white border border-gray-300 rounded-lg px-4 py-3 text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all shadow-sm"
+                  placeholder={
+                    field === "name"
+                      ? "John Doe"
+                      : field === "email"
+                      ? "email@example.com"
+                      : "••••••••"
+                  }
                 />
-                {errors[field] && <p className="text-red-400 text-xs mt-1">{errors[field]}</p>}
+                {errors[field] && (
+                  <p className="text-red-500 text-xs mt-1">{errors[field]}</p>
+                )}
               </div>
             ))}
+
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full bg-gradient-to-r from-purple-500 to-violet-600 text-white py-3 px-4 rounded-lg font-medium hover:from-purple-600 hover:to-violet-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-all"
+              className="w-full bg-gradient-to-r from-blue-500 to-purple-500 text-white py-3 px-4 rounded-lg font-semibold hover:from-blue-600 hover:to-purple-600 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 transition-all"
             >
               {isLoading ? "Creating..." : "Sign Up"}
             </button>

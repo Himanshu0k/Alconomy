@@ -1,4 +1,3 @@
-// import { useState } from "react";
 import "./App.css";
 import Home from "./components/Home";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
@@ -17,33 +16,50 @@ import AddBill from "./components/AddBill";
 import TradingApps from "./components/TradingApps";
 import Freelancer from "./components/Freelancer";
 import PayPalCheckout from "./components/PayPalCheckout";
+import ExpenseCategoryPredictor from "./components/ExpenseCategoryPredictor";
 import VoiceToText from "./components/VoiceToText";
 
-function App() {
-  // const [count, setCount] = useState(0);
+// Theme Context
+import { ThemeProvider, useTheme } from "./context/ThemeContext";
+
+function AppWrapper() {
+  const { theme } = useTheme();
 
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<SignUp />} />
-        <Route path="/main" element={<Selector />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/expenses" element={<Expenses />} />
-        <Route path="/budget" element={<Budget />} />
-        <Route path="/enter-expense" element={<EnterExpense />} />
-        <Route path="/aireport" element={<AIReports />} />
-        <Route path="/settings" element={<Settings />} />
-        <Route path="/bill-reminders" element={<BillReminders />} />
-        <Route path="/goal-savings" element={<AISavingsPlanner />} />
-        <Route path="/add-bill" element={<AddBill />} />
-        <Route path="/trading-app" element={<TradingApps />} />
-        <Route path="/freelancer" element={<Freelancer />} />
-        <Route path="/paypal-checkout" element={<PayPalCheckout />} />
-        <Route path="/voice-to-text" element={<VoiceToText />} />
-      </Routes>
-    </Router>
+    <div className={theme === "dark" ? "dark" : ""}>
+      <div className="min-h-screen bg-white text-gray-900 dark:bg-gray-900 dark:text-gray-100 transition-colors">
+        <Router>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<SignUp />} />
+            <Route path="/main" element={<Selector />} />
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/expenses" element={<Expenses />} />
+            <Route path="/budget" element={<Budget />} />
+            <Route path="/enter-expense" element={<EnterExpense />} />
+            <Route path="/aireport" element={<AIReports />} />
+            <Route path="/settings" element={<Settings />} />
+            <Route path="/bill-reminders" element={<BillReminders />} />
+            <Route path="/goal-savings" element={<AISavingsPlanner />} />
+            <Route path="/add-bill" element={<AddBill />} />
+            <Route path="/trading-app" element={<TradingApps />} />
+            <Route path="/freelancer" element={<Freelancer />} />
+            <Route path="/paypal-checkout" element={<PayPalCheckout />} />
+            <Route path="/expense-prediction" element={<ExpenseCategoryPredictor />} />
+            <Route path="/voice-to-text" element={<VoiceToText />} />
+          </Routes>
+        </Router>
+      </div>
+    </div>
+  );
+}
+
+function App() {
+  return (
+    <ThemeProvider>
+      <AppWrapper />
+    </ThemeProvider>
   );
 }
 

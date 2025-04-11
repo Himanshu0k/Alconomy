@@ -13,7 +13,7 @@ const formatLine = (line) => {
       (part.startsWith("#") && part.endsWith("#"))
     ) {
       return (
-        <span key={index} className="text-xl font-semibold text-yellow-300">
+        <span key={index} className="text-blue-700 font-semibold">
           {part.slice(1, -1)}
         </span>
       );
@@ -99,7 +99,7 @@ As a financial advisor, consider:
         },
         {
           headers: {
-            Authorization: `Bearer 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`,
+            Authorization: `Bearer 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`,
             "Content-Type": "application/json",
           },
         }
@@ -145,59 +145,59 @@ ${expenses
 
   if (loading)
     return (
-      <div className="flex items-center justify-center min-h-screen bg-gray-900 text-white text-xl">
+      <div className="flex items-center justify-center min-h-screen bg-white text-gray-800 text-xl">
         Analyzing your expenses...
       </div>
     );
 
   if (error)
     return (
-      <div className="flex items-center justify-center min-h-screen bg-gray-900 text-red-500 text-xl text-center p-4">
+      <div className="flex items-center justify-center min-h-screen bg-white text-red-600 text-xl text-center p-4">
         Error: {error}.<br />
         Please wait a moment and refresh the page.
       </div>
     );
 
   return (
-    <div className="flex min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 text-white">
-      <aside className="w-64 h-screen overflow-y-auto bg-gray-800 border-r border-gray-700 shadow-lg">
+    <div className="flex min-h-screen bg-gray-100 text-gray-800 font-sans">
+      <aside className="w-64 h-screen overflow-y-auto bg-white border-r border-gray-300 shadow-md">
         <LeftNavbar />
       </aside>
 
       <main className="flex-1 p-8 overflow-auto">
         <div className="max-w-5xl mx-auto space-y-12">
           <header className="mb-8">
-            <h1 className="text-4xl font-extrabold flex items-center gap-3">
-              <FaChartLine className="text-blue-400" />
+            <h1 className="text-4xl font-bold flex items-center gap-3 text-blue-600">
+              <FaChartLine />
               AI Financial Analysis Report
             </h1>
-            <p className="text-gray-400 text-lg">
+            <p className="text-gray-600 text-lg">
               A professional summary and actionable recommendations based on
               your recent expenses.
             </p>
           </header>
 
-          <section className="bg-gray-800 rounded-xl shadow-2xl border border-gray-700 p-8">
-            <h2 className="text-3xl font-bold mb-6 text-blue-300 border-b pb-3">
+          <section className="bg-white rounded-xl shadow-md border border-gray-200 p-8">
+            <h2 className="text-3xl font-semibold mb-6 text-blue-600 border-b pb-3">
               Key Insights
             </h2>
             {analysis ? (
-              <div className="prose prose-invert max-w-none">
+              <div className="space-y-3">
                 {analysis.split("\n").map((line, index) => (
                   <p key={index}>{formatLine(line)}</p>
                 ))}
               </div>
             ) : (
-              <p className="text-gray-400 text-center">
+              <p className="text-gray-500 text-center">
                 Report not available yet.
               </p>
             )}
           </section>
 
           <section className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div className="bg-gray-800 rounded-xl shadow-2xl border border-gray-700 p-8 hover:scale-105 transform transition duration-300">
-              <h3 className="text-2xl font-bold mb-4 flex items-center gap-2 text-green-300">
-                <FaMoneyBillWave className="inline-block" />
+            <div className="bg-white rounded-xl shadow-md border border-gray-200 p-8 hover:shadow-lg transition duration-300">
+              <h3 className="text-2xl font-bold mb-4 flex items-center gap-2 text-green-600">
+                <FaMoneyBillWave />
                 Spending Overview
               </h3>
               <p className="text-lg">
@@ -212,9 +212,9 @@ ${expenses
               </p>
             </div>
 
-            <div className="bg-gray-800 rounded-xl shadow-2xl border border-gray-700 p-8 hover:scale-105 transform transition duration-300">
-              <h3 className="text-2xl font-bold mb-4 flex items-center gap-2 text-purple-300">
-                <FaChartLine className="inline-block" />
+            <div className="bg-white rounded-xl shadow-md border border-gray-200 p-8 hover:shadow-lg transition duration-300">
+              <h3 className="text-2xl font-bold mb-4 flex items-center gap-2 text-purple-600">
+                <FaChartLine />
                 Top Categories
               </h3>
               {Object.entries(
@@ -229,7 +229,7 @@ ${expenses
                 .map(([cat, amount]) => (
                   <div
                     key={cat}
-                    className="flex justify-between py-2 border-b border-gray-700 last:border-b-0 text-lg"
+                    className="flex justify-between py-2 border-b border-gray-200 last:border-b-0 text-lg"
                   >
                     <span>{cat}</span>
                     <span>₹{amount.toFixed(2)}</span>
@@ -238,12 +238,12 @@ ${expenses
             </div>
           </section>
 
-          <section className="bg-gray-800 rounded-xl shadow-2xl border border-gray-700 p-8">
-            <h3 className="text-3xl font-bold mb-4 text-yellow-300 border-b pb-3 flex items-center gap-2">
-              <FaLightbulb className="inline-block" />
+          <section className="bg-white rounded-xl shadow-md border border-gray-200 p-8">
+            <h3 className="text-3xl font-bold mb-4 text-yellow-500 border-b pb-3 flex items-center gap-2">
+              <FaLightbulb />
               Spenders' Quick Advice
             </h3>
-            <p className="mb-4 px-4 py-2 bg-yellow-200 text-gray-900 rounded shadow">
+            <p className="mb-4 px-4 py-2 bg-yellow-100 text-yellow-900 rounded shadow">
               Personalized financial tips for each recipient.
             </p>
             {expenses.length > 0 &&
@@ -251,7 +251,7 @@ ${expenses
               <ul className="list-disc pl-6 space-y-2 text-lg">
                 {expenses.map((expense, index) => (
                   <li key={expense._id}>
-                    <span className="text-yellow-300 font-bold">
+                    <span className="text-yellow-700 font-bold">
                       {expense.description}
                     </span>
                     : {spendersAdvice[index]}
@@ -259,7 +259,7 @@ ${expenses
                 ))}
               </ul>
             ) : (
-              <p className="text-lg">Generating quick advice...</p>
+              <p className="text-lg text-gray-600">Generating quick advice...</p>
             )}
           </section>
         </div>
