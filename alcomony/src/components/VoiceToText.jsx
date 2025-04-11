@@ -1,97 +1,256 @@
-import { useState } from "react";
-import LeftNavbar from "./LeftNavbar";
-import { FaPiggyBank, FaChartPie, FaGlobe } from "react-icons/fa";
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+  BarElement,
+  ArcElement,
+} from 'chart.js';
+import { Line, Bar, Pie, Doughnut } from 'react-chartjs-2';
+import LeftNavbar from './LeftNavbar';
 
-const goalSplit = [
-  { label: "Emergency Fund", percent: 30, icon: <FaPiggyBank /> },
-  { label: "Investments", percent: 25, icon: <FaChartPie /> },
-  { label: "Travel & Leisure", percent: 20, icon: <FaGlobe /> },
-  { label: "Education", percent: 15, icon: "🎓" },
-  { label: "Miscellaneous", percent: 10, icon: "📦" },
-];
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  BarElement,
+  ArcElement,
+  Title,
+  Tooltip,
+  Legend
+);
 
-const AISavingsPlanner = () => {
-  const [amount, setAmount] = useState("");
-  const [split, setSplit] = useState([]);
+const ExpensePlot = () => {
+  const [expenses, setExpenses] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [timeRange, setTimeRange] = useState('all'); // 'all', 'month', 'week'
 
-  const handleSplit = () => {
-    const amt = parseFloat(amount);
-    if (isNaN(amt) || amt <= 0) return;
-    const result = goalSplit.map((goal) => ({
-      ...goal,
-      value: ((goal.percent / 100) * amt).toFixed(2),
-    }));
-    setSplit(result);
+  useEffect(() => {
+    const fetchExpenses = async () => {
+      try {
+        const response = await axios.get('http://localhost:5000/api/expenses/');
+        if (response.data && Array.isArray(response.data)) {
+          setExpenses(response.data);
+        } else {
+          setError('Invalid data format received from server');
+        }
+        setLoading(false);
+      } catch (err) {
+        setError('Failed to fetch expenses. Please make sure the backend server is running.');
+        setLoading(false);
+        console.error('Error fetching expenses:', err);
+      }
+    };
+
+    fetchExpenses();
+  }, []);
+
+  if (loading) return (
+    <div className="flex justify-center items-center h-screen bg-gray-900 text-white">
+      <div className="text-xl">Loading expense data...</div>
+    </div>
+  );
+  
+  if (error) return (
+    <div className="flex justify-center items-center h-screen bg-gray-900 text-white">
+      <div className="text-xl text-red-500">{error}</div>
+    </div>
+  );
+
+  if (expenses.length === 0) return (
+    <div className="flex justify-center items-center h-screen bg-gray-900 text-white">
+      <div className="text-xl">No expense data available</div>
+    </div>
+  );
+
+  // Filter expenses based on time range
+  const filteredExpenses = expenses.filter(expense => {
+    const expenseDate = new Date(expense.date);
+    const now = new Date();
+    if (timeRange === 'month') {
+      return expenseDate.getMonth() === now.getMonth() && 
+             expenseDate.getFullYear() === now.getFullYear();
+    } else if (timeRange === 'week') {
+      const weekStart = new Date(now.setDate(now.getDate() - now.getDay()));
+      return expenseDate >= weekStart;
+    }
+    return true;
+  });
+
+  // Prepare data for charts
+  const lineChartData = {
+    labels: filteredExpenses.map(expense => new Date(expense.date).toLocaleDateString()),
+    datasets: [
+      {
+        label: 'Expenses',
+        data: filteredExpenses.map(expense => expense.amount),
+        borderColor: '#F59E0B',
+        backgroundColor: 'rgba(245, 158, 11, 0.2)',
+        borderWidth: 2,
+        tension: 0.4,
+      },
+    ],
+  };
+
+  const barChartData = {
+    labels: filteredExpenses.map(expense => new Date(expense.date).toLocaleDateString()),
+    datasets: [
+      {
+        label: 'Expenses',
+        data: filteredExpenses.map(expense => expense.amount),
+        backgroundColor: 'rgba(245, 158, 11, 0.8)',
+        borderColor: '#F59E0B',
+        borderWidth: 1,
+      },
+    ],
+  };
+
+  // Group expenses by description for pie chart
+  const expenseGroups = filteredExpenses.reduce((acc, expense) => {
+    acc[expense.description] = (acc[expense.description] || 0) + expense.amount;
+    return acc;
+  }, {});
+
+  const pieChartData = {
+    labels: Object.keys(expenseGroups),
+    datasets: [
+      {
+        data: Object.values(expenseGroups),
+        backgroundColor: [
+          'rgba(245, 158, 11, 0.8)',
+          'rgba(16, 185, 129, 0.8)',
+          'rgba(59, 130, 246, 0.8)',
+          'rgba(139, 92, 246, 0.8)',
+          'rgba(239, 68, 68, 0.8)',
+        ],
+        borderColor: [
+          '#F59E0B',
+          '#10B981',
+          '#3B82F6',
+          '#8B5CF6',
+          '#EF4444',
+        ],
+        borderWidth: 1,
+      },
+    ],
+  };
+
+  const chartOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { 
+        labels: { color: '#fff' },
+        position: 'top',
+      },
+      title: {
+        display: true,
+        text: 'Expense Analysis',
+        color: '#fff',
+        font: {
+          size: 16,
+        },
+      },
+    },
+    scales: {
+      y: {
+        beginAtZero: true,
+        title: {
+          display: true,
+          text: 'Amount',
+          color: '#fff',
+        },
+        ticks: { color: '#fff' },
+        grid: { color: 'rgba(255, 255, 255, 0.1)' },
+      },
+      x: {
+        title: {
+          display: true,
+          text: 'Date',
+          color: '#fff',
+        },
+        ticks: { color: '#fff' },
+        grid: { color: 'rgba(255, 255, 255, 0.1)' },
+      },
+    },
   };
 
   return (
-    <div className="flex min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 text-white">
-      {/* Sidebar */}
-      <aside className="w-64 h-screen overflow-y-auto bg-gray-800 border-r border-gray-700 shadow-lg">
+    <div className="flex min-h-screen bg-gray-900">
+      <div className="fixed left-0 top-0 h-full">
         <LeftNavbar />
-      </aside>
-
-      {/* Main Content */}
-      <main className="flex-1 p-8 overflow-auto">
-        <div className="max-w-4xl mx-auto space-y-10">
-          <header className="mb-6">
-            <h1 className="text-4xl font-extrabold flex items-center gap-3">
-              <FaPiggyBank className="text-pink-400" />
-              AI Savings Planner
-            </h1>
-            <p className="text-gray-400 text-lg">
-              Distribute your savings towards meaningful future goals.
-            </p>
-          </header>
-
-          {/* Input Form */}
-          <section className="bg-gray-800 rounded-xl shadow-2xl border border-gray-700 p-8">
-            <h2 className="text-3xl font-bold mb-4 text-pink-300 border-b pb-3">
-              Enter Savings
-            </h2>
-            <div className="flex flex-col sm:flex-row items-center gap-4">
-              <input
-                type="number"
-                value={amount}
-                onChange={(e) => setAmount(e.target.value)}
-                placeholder="Enter amount (₹)"
-                className="w-full sm:w-1/2 px-4 py-2 rounded-lg bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-pink-400"
-              />
-              <button
-                onClick={handleSplit}
-                className="px-6 py-2 bg-pink-500 hover:bg-pink-600 text-white font-semibold rounded-xl shadow transition duration-300"
-              >
-                Split Savings
-              </button>
-            </div>
-          </section>
-
-          {/* Split Results */}
-          {split.length > 0 && (
-            <section className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {split.map((goal, index) => (
-                <div
-                  key={index}
-                  className="bg-gray-800 rounded-xl shadow-xl border border-gray-700 p-6 transform hover:scale-105 transition duration-300"
-                >
-                  <h3 className="text-2xl font-bold mb-2 flex items-center gap-2 text-blue-300">
-                    <span className="text-xl">{goal.icon}</span>
-                    {goal.label}
-                  </h3>
-                  <p className="text-lg text-gray-300">
-                    {goal.percent}% of savings
-                  </p>
-                  <p className="text-xl font-semibold text-green-400 mt-2">
-                    ₹{goal.value}
-                  </p>
-                </div>
-              ))}
-            </section>
-          )}
+      </div>
+      <div className="flex-1 ml-64 p-8">
+        <div className="mb-6 flex justify-between items-center">
+          <h1 className="text-3xl font-bold text-white">Expense Analytics</h1>
+          <div className="flex space-x-4">
+            <button
+              onClick={() => setTimeRange('all')}
+              className={`px-4 py-2 rounded ${
+                timeRange === 'all' ? 'bg-amber-500 text-white' : 'bg-gray-700 text-gray-300'
+              }`}
+            >
+              All Time
+            </button>
+            <button
+              onClick={() => setTimeRange('month')}
+              className={`px-4 py-2 rounded ${
+                timeRange === 'month' ? 'bg-amber-500 text-white' : 'bg-gray-700 text-gray-300'
+              }`}
+            >
+              This Month
+            </button>
+            <button
+              onClick={() => setTimeRange('week')}
+              className={`px-4 py-2 rounded ${
+                timeRange === 'week' ? 'bg-amber-500 text-white' : 'bg-gray-700 text-gray-300'
+              }`}
+            >
+              This Week
+            </button>
+          </div>
         </div>
-      </main>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="bg-gray-800 p-6 rounded-lg shadow-lg">
+            <h3 className="text-xl font-semibold mb-4 text-white">Expense Trends</h3>
+            <div className="h-80">
+              <Line data={lineChartData} options={chartOptions} />
+            </div>
+          </div>
+
+          <div className="bg-gray-800 p-6 rounded-lg shadow-lg">
+            <h3 className="text-xl font-semibold mb-4 text-white">Expense Distribution</h3>
+            <div className="h-80">
+              <Bar data={barChartData} options={chartOptions} />
+            </div>
+          </div>
+
+          <div className="bg-gray-800 p-6 rounded-lg shadow-lg">
+            <h3 className="text-xl font-semibold mb-4 text-white">Expense Categories</h3>
+            <div className="h-80">
+              <Pie data={pieChartData} options={chartOptions} />
+            </div>
+          </div>
+
+          <div className="bg-gray-800 p-6 rounded-lg shadow-lg">
+            <h3 className="text-xl font-semibold mb-4 text-white">Expense Breakdown</h3>
+            <div className="h-80">
+              <Doughnut data={pieChartData} options={chartOptions} />
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
 
-export default AISavingsPlanner;
+export default ExpensePlot; 

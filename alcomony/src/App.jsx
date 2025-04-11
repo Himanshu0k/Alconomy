@@ -5,6 +5,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Selector from "./components/Selector";
 import Dashboard from "./components/Dashboard";
 import Login from "./components/Login";
+import SignUp from "./components/SignUp";
 import Expenses from "./components/Expenses";
 import Budget from "./components/Budget";
 import EnterExpense from "./components/EnterExpense";
@@ -26,6 +27,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<SignUp />} />
         <Route path="/main" element={<Selector />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/expenses" element={<Expenses />} />

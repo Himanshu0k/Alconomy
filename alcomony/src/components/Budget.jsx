@@ -3,7 +3,7 @@ import LeftNavbar from "./LeftNavbar"; // Adjust the import path as needed
 
 function Budget() {
   // Dummy budget data
-  const [budget, setBudget] = useState({
+  const [budget] = useState({
     totalBudget: 1000,
     spent: 250,
     remaining: 750,

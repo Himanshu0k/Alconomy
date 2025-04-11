@@ -4,7 +4,6 @@ import LeftNavbar from "./LeftNavbar";
 import { FaChartLine, FaLightbulb, FaMoneyBillWave } from "react-icons/fa";
 
 // Helper function to format a line of text.
-// It searches for text wrapped in * or # and returns styled spans for those segments.
 const formatLine = (line) => {
   const regex = /(\*[^*]+\*|#[^#]+#)/g;
   const parts = line.split(regex);
@@ -24,6 +23,26 @@ const formatLine = (line) => {
   });
 };
 
+// Delay helper
+const delay = (ms) => new Promise((res) => setTimeout(res, ms));
+
+// Retry wrapper with exponential backoff
+const retryWithBackoff = async (fn, maxRetries = 3) => {
+  for (let attempt = 0; attempt < maxRetries; attempt++) {
+    try {
+      return await fn();
+    } catch (err) {
+      if (err.response?.status === 429 && attempt < maxRetries - 1) {
+        const wait = 2 ** attempt * 1000;
+        console.warn(`Rate limit hit. Retrying in ${wait}ms...`);
+        await delay(wait);
+      } else {
+        throw err;
+      }
+    }
+  }
+};
+
 const AIReports = () => {
   const [expenses, setExpenses] = useState([]);
   const [analysis, setAnalysis] = useState("");
@@ -31,31 +50,29 @@ const AIReports = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  // Fetch expenses from backend
   useEffect(() => {
     const fetchData = async () => {
       try {
         const response = await axios.get("http://localhost:5000/api/expenses");
         setExpenses(response.data);
-        // Only generate analysis/advice if there are expenses to analyze
+
         if (response.data.length > 0) {
-          generateAnalysis(response.data);
-          generateSpendersAdvice(response.data);
+          await generateAnalysis(response.data);
+          await generateSpendersAdvice(response.data);
         }
       } catch (err) {
-        setError("Failed to fetch expense data");
+        setError("Failed to fetch expense data or generate reports.");
         console.error(err);
       } finally {
         setLoading(false);
       }
     };
+
     fetchData();
   }, []);
 
-  // Generate AI analysis using Groq
   const generateAnalysis = async (expenses) => {
-    try {
-      const prompt = `Analyze these expenses and provide financial recommendations:
+    const prompt = `Analyze these expenses and provide financial recommendations:
 ${expenses
   .map(
     (e) =>
@@ -72,6 +89,7 @@ As a financial advisor, consider:
 4. Budget optimization tips
 5. Short-term actionable steps`;
 
+    return retryWithBackoff(async () => {
       const response = await axios.post(
         "https://api.groq.com/openai/v1/chat/completions",
         {
@@ -87,17 +105,11 @@ As a financial advisor, consider:
         }
       );
       setAnalysis(response.data.choices[0].message.content);
-    } catch (err) {
-      setError("Failed to generate analysis");
-      console.error("Groq API Error:", err);
-    }
+    });
   };
 
-  // Generate quick, person-to-person advice for each expense using the description as recipient name.
   const generateSpendersAdvice = async (expenses) => {
-    try {
-      // The prompt is now built so that each expense line is generated, and we assume one advice per expense.
-      const prompt = `For each of the following expenses, provide one clear, actionable financial advice in a professional tone.
+    const prompt = `For each of the following expenses, provide one clear, actionable financial advice in a professional tone.
 Format your response so that each line corresponds to the expense in order.
 ${expenses
   .map(
@@ -108,6 +120,7 @@ ${expenses
   )
   .join("\n")}`;
 
+    return retryWithBackoff(async () => {
       const response = await axios.post(
         "https://api.groq.com/openai/v1/chat/completions",
         {
@@ -122,15 +135,12 @@ ${expenses
           },
         }
       );
-
       const adviceText = response.data.choices[0].message.content;
       const adviceLines = adviceText
         .split("\n")
         .filter((line) => line.trim() !== "");
       setSpendersAdvice(adviceLines);
-    } catch (err) {
-      console.error("Failed to generate spenders advice:", err);
-    }
+    });
   };
 
   if (loading)
@@ -139,21 +149,21 @@ ${expenses
         Analyzing your expenses...
       </div>
     );
+
   if (error)
     return (
-      <div className="flex items-center justify-center min-h-screen bg-gray-900 text-red-500 text-xl">
-        Error: {error}
+      <div className="flex items-center justify-center min-h-screen bg-gray-900 text-red-500 text-xl text-center p-4">
+        Error: {error}.<br />
+        Please wait a moment and refresh the page.
       </div>
     );
 
   return (
     <div className="flex min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 text-white">
-      {/* Sidebar */}
       <aside className="w-64 h-screen overflow-y-auto bg-gray-800 border-r border-gray-700 shadow-lg">
         <LeftNavbar />
       </aside>
 
-      {/* Main Content */}
       <main className="flex-1 p-8 overflow-auto">
         <div className="max-w-5xl mx-auto space-y-12">
           <header className="mb-8">
@@ -167,7 +177,6 @@ ${expenses
             </p>
           </header>
 
-          {/* Analysis Report */}
           <section className="bg-gray-800 rounded-xl shadow-2xl border border-gray-700 p-8">
             <h2 className="text-3xl font-bold mb-6 text-blue-300 border-b pb-3">
               Key Insights
@@ -185,7 +194,6 @@ ${expenses
             )}
           </section>
 
-          {/* Overview Cards */}
           <section className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div className="bg-gray-800 rounded-xl shadow-2xl border border-gray-700 p-8 hover:scale-105 transform transition duration-300">
               <h3 className="text-2xl font-bold mb-4 flex items-center gap-2 text-green-300">
@@ -230,13 +238,11 @@ ${expenses
             </div>
           </section>
 
-          {/* Spenders Quick Advice */}
           <section className="bg-gray-800 rounded-xl shadow-2xl border border-gray-700 p-8">
             <h3 className="text-3xl font-bold mb-4 text-yellow-300 border-b pb-3 flex items-center gap-2">
               <FaLightbulb className="inline-block" />
               Spenders' Quick Advice
             </h3>
-            {/* Highlighted description for quick advice */}
             <p className="mb-4 px-4 py-2 bg-yellow-200 text-gray-900 rounded shadow">
               Personalized financial tips for each recipient.
             </p>
